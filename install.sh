@@ -10,7 +10,7 @@ echo "  - copying default configs"
 for file in $(ls "${DIR}/config")
 do
   echo "    -> ${file}"
-  cp -a "${file}" "~/.funload"
+  cp -a "${DIR}/config/${file}" "~/.funload/"
 done
 
 echo "  - store path to executable"
