@@ -23,7 +23,7 @@ crontab -l > ${BFILE}
 
 echo "  - adding entry in crontab"
 crontab -l > ${TFILE}
-echo "$(shuf -i 0-60 -n 1) * * * * "${DIR}/funload.sh" >> funload.log 2>&1" >> ${TFILE}
+echo "$(shuf -i 0-60 -n 1) * * * * \"${DIR}/funload.sh\" >> funload.log 2>&1" >> ${TFILE}
 crontab ${TFILE}
 rm ${TFILE}
 
