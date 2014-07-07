@@ -81,9 +81,9 @@ def totgelacht():
 
             content = urllib.urlopen(current).read()
             if content.find("'file': 'http://www.youtube") != -1:
-                content = content[content.find("'file': 'http://www.youtube") + 7:]
+                content = content[content.find("'file': 'http://www.youtube") + 9:]
                 content = content[:content.find("'")]
-                os.system("echo \"\tFound youtube video $(youtube-dl --get-id " + content +" 2> /dev/null).\"")
+                print("\tFound youtube video [" + content + "]")
                 os.system("youtube-dl -q -o 'funload/%(id)s.%(ext)s' " + content + " > /dev/null 2>&1")
             else:
                 prefix = "'file': '"
