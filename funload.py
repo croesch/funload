@@ -10,7 +10,6 @@ def configFile(project, mode):
     return open(os.path.expanduser("~/.funload/" + project), mode)
 
 def download1(project, address):
-def hornoxe():
     f = configFile(project, 'r')
     lastBuild = datetime.strptime(f.readline().rstrip('\n'), "%a, %d %b %Y %H:%M:%S +0000")
     f.close()
