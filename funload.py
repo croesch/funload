@@ -9,14 +9,15 @@ from datetime import datetime, time, date
 def configFile(project, mode):
     return open(os.path.expanduser("~/.funload/" + project), mode)
 
+def download1(project, address):
 def hornoxe():
-    f = configFile('hornoxe', 'r')
+    f = configFile(project, 'r')
     lastBuild = datetime.strptime(f.readline().rstrip('\n'), "%a, %d %b %Y %H:%M:%S +0000")
     f.close()
     print("Last read build was at " + lastBuild.isoformat())
 
     print("Fetching..")
-    rsstext = urllib.urlopen("http://hornoxe.com/feed/")
+    rsstext = urllib.urlopen(address)
     print("Parsing..")
     root = ET.parse(rsstext).getroot()
     channel = root.find('channel')
@@ -27,7 +28,7 @@ def hornoxe():
 
     if currentBuild > lastBuild:
         print("Storing current build time.")
-        f = configFile('hornoxe', 'w')
+        f = configFile(project, 'w')
         f.write(currentBuildText)
         f.close()
 
@@ -52,6 +53,12 @@ def hornoxe():
                         print("\tdone.")
     else:
         print("So no new version available..")
+
+def hornoxe():
+    download1('hornoxe', "http://hornoxe.com/feed/")
+
+def orschlurch():
+    download1('orschlurch', "http://www.orschlurch.net/kategorie/videos/feed/")
 
 def totgelacht():
     f = configFile('totgelacht', 'r')
@@ -104,4 +111,5 @@ def totgelacht():
         number += 1
 
 hornoxe()
+orschlurch()
 totgelacht()
