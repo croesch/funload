@@ -59,6 +59,12 @@ def hornoxe():
 def orschlurch():
     download1('orschlurch', "http://www.orschlurch.net/kategorie/videos/feed/")
 
+def youtube(link):
+    if link.find("?") != -1:
+        link = link[:link.find("?")]
+    print("\tFound youtube video [" + link + "]")
+    os.system("youtube-dl -q -o 'funload/%(id)s.%(ext)s' " + link + " > /dev/null 2>&1")
+
 def totgelacht():
     f = configFile('totgelacht', 'r')
     last = f.readline().rstrip('\n')
@@ -86,11 +92,16 @@ def totgelacht():
                 f.close()
 
             content = urllib.urlopen(current).read()
-            if content.find("'file': 'http://www.youtube") != -1:
-                content = content[content.find("'file': 'http://www.youtube") + 9:]
+            youtubeMarker1 = "'file': 'http://www.youtube"
+            youtubeMarker2 = 'value="http://www.youtube'
+            if content.find(youtubeMarker1) != -1:
+                content = content[content.find(youtubeMarker1) + 9:]
                 content = content[:content.find("'")]
-                print("\tFound youtube video [" + content + "]")
-                os.system("youtube-dl -q -o 'funload/%(id)s.%(ext)s' " + content + " > /dev/null 2>&1")
+                youtube(content)
+            elif content.find(youtubeMarker2) != -1:
+                content = content[content.find(youtubeMarker2) + 7:]
+                content = content[:content.find('"')]
+                youtube(content)
             else:
                 prefix = "'file': '"
                 pos = content.find(prefix)
