@@ -106,6 +106,7 @@ def totgelacht():
             elif content.find(youtubeMarker3) != -1:
                 content = content[content.find(youtubeMarker3) + 5:]
                 content = content[:content.find('"')]
+                youtube(content)
             else:
                 prefix = "'file': '"
                 pos = content.find(prefix)
