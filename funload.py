@@ -94,6 +94,7 @@ def totgelacht():
             content = urllib.urlopen(current).read()
             youtubeMarker1 = "'file': 'http://www.youtube"
             youtubeMarker2 = 'value="http://www.youtube'
+            youtubeMarker3 = 'src="http://www.youtube'
             if content.find(youtubeMarker1) != -1:
                 content = content[content.find(youtubeMarker1) + 9:]
                 content = content[:content.find("'")]
@@ -102,6 +103,9 @@ def totgelacht():
                 content = content[content.find(youtubeMarker2) + 7:]
                 content = content[:content.find('"')]
                 youtube(content)
+            elif content.find(youtubeMarker3) != -1:
+                content = content[content.find(youtubeMarker3) + 5:]
+                content = content[:content.find('"')]
             else:
                 prefix = "'file': '"
                 pos = content.find(prefix)
