@@ -61,7 +61,7 @@ def item_node_parse(item_node, last_build):
 
 
 def download(url):
-    if url.find("youtube"):
+    if url.find("youtube") != -1:
         link = url
         if link.find("?") != -1:
             link = link[:link.find("?")]
