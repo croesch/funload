@@ -1,56 +1,56 @@
 #!/usr/bin/env python3
 
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ElemT
 
 import urllib
 import os
 from datetime import datetime
 
 
-def configFile(project, mode):
+def config_file(project, mode):
     return open(os.path.expanduser("~/.funload/" + project), mode)
 
 
 def download1(project, address):
-    f = configFile(project, 'r')
-    lastBuild = datetime.strptime(f.readline().rstrip('\n'), "%a, %d %b %Y %H:%M:%S +0000")
+    f = config_file(project, 'r')
+    last_build = datetime.strptime(f.readline().rstrip('\n'), "%a, %d %b %Y %H:%M:%S +0000")
     f.close()
-    print("Last read build was at " + lastBuild.isoformat())
+    print("Last read build was at " + last_build.isoformat())
 
     print("Fetching..")
-    rsstext = urllib.urlopen(address)
+    rss_text = urllib.urlopen(address)
     print("Parsing..")
-    root = ET.parse(rsstext).getroot()
+    root = ElemT.parse(rss_text).getroot()
     channel = root.find('channel')
 
-    currentBuildText = channel.find('lastBuildDate').text
-    currentBuild = datetime.strptime(currentBuildText, "%a, %d %b %Y %H:%M:%S +0000")
-    print("Current build is from " + currentBuild.isoformat())
+    current_build_text = channel.find('lastBuildDate').text
+    current_build = datetime.strptime(current_build_text, "%a, %d %b %Y %H:%M:%S +0000")
+    print("Current build is from " + current_build.isoformat())
 
-    if currentBuild > lastBuild:
+    if current_build > last_build:
         print("Storing current build time.")
-        f = configFile(project, 'w')
-        f.write(currentBuildText)
+        f = config_file(project, 'w')
+        f.write(current_build_text)
         f.close()
 
         for item_node in channel.iter('item'):
             print(item_node.find('link').text)
-            itemPubDateText = item_node.find('pubDate').text
-            itemPubDate = datetime.strptime(itemPubDateText, "%a, %d %b %Y %H:%M:%S +0000")
-            if itemPubDate < lastBuild:
+            item_pub_date_text = item_node.find('pubDate').text
+            item_pub_date = datetime.strptime(item_pub_date_text, "%a, %d %b %Y %H:%M:%S +0000")
+            if item_pub_date < last_build:
                 print("\tOlder than last build..")
             else:
                 print("\tMust be new..")
                 for enclosure in item_node.iter('enclosure'):
                     url = enclosure.attrib['url']
                     filename = os.path.basename(url)
-                    filepath = 'funload/' + filename
+                    file_path = 'funload/' + filename
                     print("\tFound file '" + filename + "'")
-                    if os.path.exists(filepath):
+                    if os.path.exists(file_path):
                         print("\talready exists.")
                     else:
                         print("\tdownloading..")
-                        urllib.urlretrieve(url, filepath)
+                        urllib.urlretrieve(url, file_path)
                         print("\tdone.")
     else:
         print("So no new version available..")
@@ -72,45 +72,45 @@ def youtube(link):
 
 
 def totgelacht():
-    f = configFile('totgelacht', 'r')
+    f = config_file('totgelacht', 'r')
     last = f.readline().rstrip('\n')
     f.close()
     print("Last read link was " + last)
 
     print("Fetching..")
-    rsstext = urllib.urlopen("http://www.totgelacht.com/rss2.php")
+    rss_text = urllib.urlopen("http://www.totgelacht.com/rss2.php")
     print("Parsing..")
-    root = ET.parse(rsstext).getroot()
+    root = ElemT.parse(rss_text).getroot()
     channel = root.find('channel')
 
     number = 1
     for item_node in channel.iter('item'):
         current = item_node.find('link').text
         print("{}: {}".format(number, current))
-        if (current == last):
+        if current == last:
             print("\tThis was the last read item.")
             break
         else:
             if number == 1:
                 print("\tStoring the link.")
-                f = configFile('totgelacht', 'w')
+                f = config_file('totgelacht', 'w')
                 f.write(current)
                 f.close()
 
             content = urllib.urlopen(current).read()
-            youtubeMarker1 = "'file': 'http://www.youtube"
-            youtubeMarker2 = 'value="http://www.youtube'
-            youtubeMarker3 = 'src="http://www.youtube'
-            if content.find(youtubeMarker1) != -1:
-                content = content[content.find(youtubeMarker1) + 9:]
+            youtube_marker1 = "'file': 'http://www.youtube"
+            youtube_marker2 = 'value="http://www.youtube'
+            youtube_marker3 = 'src="http://www.youtube'
+            if content.find(youtube_marker1) != -1:
+                content = content[content.find(youtube_marker1) + 9:]
                 content = content[:content.find("'")]
                 youtube(content)
-            elif content.find(youtubeMarker2) != -1:
-                content = content[content.find(youtubeMarker2) + 7:]
+            elif content.find(youtube_marker2) != -1:
+                content = content[content.find(youtube_marker2) + 7:]
                 content = content[:content.find('"')]
                 youtube(content)
-            elif content.find(youtubeMarker3) != -1:
-                content = content[content.find(youtubeMarker3) + 5:]
+            elif content.find(youtube_marker3) != -1:
+                content = content[content.find(youtube_marker3) + 5:]
                 content = content[:content.find('"')]
                 youtube(content)
             else:
@@ -121,12 +121,12 @@ def totgelacht():
                     content = content[:content.find("'")]
                     url = "http://www.totgelacht.com/content/" + content
                     filename = os.path.basename(url)
-                    filepath = 'funload/' + filename
+                    file_path = 'funload/' + filename
                     print("\tFound file '" + filename + "'")
-                    if os.path.exists(filepath):
+                    if os.path.exists(file_path):
                         print("\talready exists.")
                     else:
-                        urllib.urlretrieve(url, filepath)
+                        urllib.urlretrieve(url, file_path)
                 else:
                     print("\tSeems to be neither youtube nor a video..")
         number += 1
