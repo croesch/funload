@@ -3,11 +3,13 @@
 import xml.etree.ElementTree as ET
 
 import urllib
-import sys, os
-from datetime import datetime, time, date
+import os
+from datetime import datetime
+
 
 def configFile(project, mode):
     return open(os.path.expanduser("~/.funload/" + project), mode)
+
 
 def download1(project, address):
     f = configFile(project, 'r')
@@ -53,17 +55,21 @@ def download1(project, address):
     else:
         print("So no new version available..")
 
+
 def hornoxe():
     download1('hornoxe', "http://hornoxe.com/feed/")
 
+
 def orschlurch():
     download1('orschlurch', "http://www.orschlurch.net/kategorie/videos/feed/")
+
 
 def youtube(link):
     if link.find("?") != -1:
         link = link[:link.find("?")]
     print("\tFound youtube video [" + link + "]")
     os.system("youtube-dl -q -o 'funload/%(id)s.%(ext)s' " + link + " > /dev/null 2>&1")
+
 
 def totgelacht():
     f = configFile('totgelacht', 'r')
@@ -80,8 +86,8 @@ def totgelacht():
     number = 1
     for item_node in channel.iter('item'):
         current = item_node.find('link').text
-        print("{}: {}".format(number ,current))
-        if(current == last):
+        print("{}: {}".format(number, current))
+        if (current == last):
             print("\tThis was the last read item.")
             break
         else:
@@ -113,7 +119,7 @@ def totgelacht():
                 if pos != -1:
                     content = content[pos + len(prefix):]
                     content = content[:content.find("'")]
-                    url = "http://www.totgelacht.com/content/" +    content
+                    url = "http://www.totgelacht.com/content/" + content
                     filename = os.path.basename(url)
                     filepath = 'funload/' + filename
                     print("\tFound file '" + filename + "'")
@@ -124,6 +130,7 @@ def totgelacht():
                 else:
                     print("\tSeems to be neither youtube nor a video..")
         number += 1
+
 
 hornoxe()
 orschlurch()
