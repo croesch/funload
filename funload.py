@@ -121,7 +121,8 @@ def orschlurch(config):
 
 
 def emok(config):
-    links = get_all_new_emok_video_pages(config, 'emok', urllib.urlopen("http://www.emok.tv/category/own-content/feed"))
+    xml = ElemT.parse(urllib.urlopen("http://www.emok.tv/category/own-content/feed"))
+    links = get_all_new_emok_video_pages(config, 'emok', xml)
     urls = []
     for link in links:
         urls.extend(extract_emok_video_urls(urllib.urlopen(link)))
