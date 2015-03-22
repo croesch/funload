@@ -6,17 +6,12 @@ import urllib
 import os
 from datetime import datetime
 
+
 namespaces = {'content': "http://purl.org/rss/1.0/modules/content/"}
 
 
-def config_file(project, mode):
-    return open(os.path.expanduser("~/.funload/" + project), mode)
-
-
-def download1(project, address):
-    f = config_file(project, 'r')
-    last_build = datetime.strptime(f.readline().rstrip('\n'), "%a, %d %b %Y %H:%M:%S +0000")
-    f.close()
+def download1(config, project, address):
+    last_build = config.get_last_build(project)
     print("Last read build was at " + last_build.isoformat())
 
     print("Fetching..")
@@ -31,9 +26,7 @@ def download1(project, address):
 
     if current_build > last_build:
         print("Storing current build time.")
-        f = config_file(project, 'w')
-        f.write(current_build_text)
-        f.close()
+        config.write(project, current_build_text)
 
         for item_node in channel.iter('item'):
             for url in item_node_parse(item_node, last_build):
@@ -79,17 +72,84 @@ def download(url):
             print("\tdone.")
 
 
-def hornoxe():
-    download1('hornoxe', "http://hornoxe.com/feed/")
+def get_all_new_emok_video_pages(config, project, xml):
+    links = []
+
+    last_build = config.get_last_build(project)
+    print("Last read build was at " + last_build.isoformat())
+
+    print("Parsing..")
+    root = xml.getroot()
+    channel = root.find('channel')
+
+    current_build_text = channel.find('lastBuildDate').text
+    current_build = datetime.strptime(current_build_text, "%a, %d %b %Y %H:%M:%S +0000")
+    print("Current build is from " + current_build.isoformat())
+
+    if current_build > last_build:
+        print("Storing current build time.")
+        config.write(project, last_build)
+
+        for item_node in channel.iter('item'):
+            print(item_node.find('link').text)
+            item_pub_date_text = item_node.find('pubDate').text
+            item_pub_date = datetime.strptime(item_pub_date_text, "%a, %d %b %Y %H:%M:%S +0000")
+            if item_pub_date < last_build:
+                print("\tOlder than last build..")
+            else:
+                links.append(item_node.find('link').text)
+    else:
+        print("So no new version available..")
+    return links
 
 
-def orschlurch():
-    download1('orschlurch', "http://www.orschlurch.net/kategorie/videos/feed/")
+def extract_emok_video_urls(file):
+    urls = []
+
+    for url_match in re.finditer("\"(http://[^\"]+\.mp4)\"", file.read()):
+        urls.append(url_match.group(1))
+
+    return urls
+
+
+def hornoxe(config):
+    download1(config, 'hornoxe', "http://hornoxe.com/feed/")
+
+
+def orschlurch(config):
+    download1(config, 'orschlurch', "http://www.orschlurch.net/kategorie/videos/feed/")
+
+
+def emok(config):
+    links = get_all_new_emok_video_pages(config, 'emok', urllib.urlopen("http://www.emok.tv/category/own-content/feed"))
+    urls = []
+    for link in links:
+        urls.extend(extract_emok_video_urls(urllib.urlopen(link)))
+    for url in urls:
+        download(url)
 
 
 def main():
-    hornoxe()
-    orschlurch()
+    config = Config()
+    hornoxe(config)
+    orschlurch(config)
+    emok(config)
+
+
+class Config():
+    def config_file(self, project, mode):
+        return open(os.path.expanduser("~/.funload/" + project), mode)
+
+    def get_last_build(self, project):
+        f = self.config_file(project, 'r')
+        last_build = datetime.strptime(f.readline().rstrip('\n'), "%a, %d %b %Y %H:%M:%S +0000")
+        f.close()
+        return last_build
+
+    def write(self, project, content):
+        f = self.config_file(project, 'w')
+        f.write(content)
+        f.close()
 
 
 if __name__ == "__main__":
