@@ -42,6 +42,14 @@ class TestHornoxe(unittest.TestCase):
 
 
 class TestEmok(unittest.TestCase):
+    def test_get_all_new_emok_video_pages__updates_config(self):
+        config = MockConfig()
+        xml = get_test_xml("test_emok_videofeed")
+        config.write('emok', datetime.datetime(2007, 12, 5))
+
+        funload.get_all_new_emok_video_pages(config, 'emok', xml)
+        self.assertEquals(config.get_last_build('emok'), "Sun, 22 Mar 2015 11:50:52 +0000")
+
     def test_get_all_new_emok_video_pages(self):
         config = MockConfig()
         xml = get_test_xml("test_emok_videofeed")

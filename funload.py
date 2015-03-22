@@ -88,7 +88,7 @@ def get_all_new_emok_video_pages(config, project, xml):
 
     if current_build > last_build:
         print("Storing current build time.")
-        config.write(project, last_build)
+        config.write(project, current_build_text)
 
         for item_node in channel.iter('item'):
             print(item_node.find('link').text)
