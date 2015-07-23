@@ -50,6 +50,8 @@ def item_node_parse(item_node, last_build):
         for content in item_node.iterfind('content:encoded', namespaces=namespaces):
             for match in re.finditer('https?://(www)?\.youtube[^"\']*', content.text):
                 urls.append(match.group(0))
+            for match in re.finditer('SFYouTubePlayer.embedPlayer\("([^"\']*)', content.text):
+                urls.append(match.group(1))
     return urls
 
 

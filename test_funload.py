@@ -40,6 +40,13 @@ class TestHornoxe(unittest.TestCase):
                                 "https://www.youtube.com/embed/_df8tHFOxgg?rel=0&amp;showinfo=0",
                                 "https://www.youtube.com/embed/BRvfZmwwHF0?rel=0&amp;showinfo=0"])
 
+    def test_buzz_driver_link(self):
+        item = get_item("test_buzz_driver_link")
+        date = datetime.datetime(2007, 12, 6)
+
+        urls = funload.item_node_parse(item, date)
+        self.assertEquals(urls, ["3TYlQjkH1OE"])
+
 
 class TestEmok(unittest.TestCase):
     def test_get_all_new_emok_video_pages__updates_config(self):
