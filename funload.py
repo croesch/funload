@@ -20,7 +20,7 @@ def download1(config, project, address):
     root = ElemT.parse(rss_text).getroot()
     channel = root.find('channel')
 
-    current_build_text = channel.find('lastBuildDate').text
+    current_build_text = channel.find('lastBuildDate').text.strip()
     current_build = datetime.strptime(current_build_text, "%a, %d %b %Y %H:%M:%S +0000")
     print("Current build is from " + current_build.isoformat())
 
@@ -84,7 +84,7 @@ def get_all_new_emok_video_pages(config, project, xml):
     root = xml.getroot()
     channel = root.find('channel')
 
-    current_build_text = channel.find('lastBuildDate').text
+    current_build_text = channel.find('lastBuildDate').text.strip()
     current_build = datetime.strptime(current_build_text, "%a, %d %b %Y %H:%M:%S +0000")
     print("Current build is from " + current_build.isoformat())
 
